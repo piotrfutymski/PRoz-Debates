@@ -8,8 +8,13 @@
 
 /* używane w wątku głównym, determinuje jak często i na jak długo zmieniają się stany */
 #define STATE_CHANGE_PROB 50
-#define SEC_IN_STATE 2
-#define LOOSE_TIME 5
+#define SEC_IN_STATE 1
+#define LOOSE_TIME 1
+
+#define N_SLIPY 3
+#define N_MICHA 3
+#define N_PINEZKA 3
+#define N_SALKA 1
 
 #define ROOT 0
 
@@ -35,6 +40,8 @@ extern process_queue_t waitQueueS;
 extern int ackCounterS;
 
 extern int ackPriority;
+extern int ackSPriority;
+extern int jestem;
 
 extern int przeciwnik;
 typedef enum {PINEZKA, SLIPY, MICHA} argument_t;
@@ -43,6 +50,8 @@ extern argument_t opponentArgument;
 extern int opponentReady;
 extern process_queue_t processQueue;
 extern int pairCounter;
+
+
 
 
 typedef struct {

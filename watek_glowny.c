@@ -24,6 +24,7 @@ void mainLoop()
             {
                 debug("Rozpoczynam debatę z %d", przeciwnik);
                 sleep( SEC_IN_STATE);
+                pthread_mutex_lock( &stateMut );
                 if(calculateWinner())
                 {
                     debug("Kończę debatę z %d. WYGRAŁEM :D", przeciwnik);
@@ -32,8 +33,7 @@ void mainLoop()
                 {
                     debug("Kończę debatę z %d. PRZEGRAŁEM :(", przeciwnik);
                     sleep( LOOSE_TIME );
-                }
-                pthread_mutex_lock( &stateMut );
+                }            
                 debug("Zmieniam stan na {REST}");
                 changeState(REST);
                 onStartResting();
@@ -93,14 +93,15 @@ void onStartResting()
         sendPacket( pkt, waitQueueS.data[i].process, ACK_SALKA);
     }
     removeNFirstElements(&waitQueueS, waitQueueG.size);
+    opponentReady = FALSE;
 }
 
 int calculateWinner()
 {
+    debug("Moim argumentem jest: %d, a przeciwnika %d", argument, opponentArgument);
     if(argument == opponentArgument)
     {
-        int perc = random()%100;
-        if(perc >= 50)
+        if(przeciwnik > rank)
             return TRUE;
         return FALSE; 
     }

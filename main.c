@@ -12,7 +12,7 @@
 
 state_t stan = REST;
 argument_t argument, opponentArgument;
-int size, rank, zegar, ackCounterG, ackCounterM, ackCounterP, ackCounterS, przeciwnik, opponentReady, pairCounter, ackPriority; /* nie trzeba zerować, bo zmienna globalna statyczna */
+int size, rank, zegar, ackCounterG, ackSPriority, ackCounterM, ackCounterP, ackCounterS, przeciwnik, opponentReady, pairCounter, ackPriority, jestem; /* nie trzeba zerować, bo zmienna globalna statyczna */
 process_queue_t waitQueueG, waitQueueM, waitQueueP, waitQueueS, processQueue;
 
 MPI_Datatype MPI_PAKIET_T;
@@ -114,6 +114,7 @@ void sendPacket(packet_t *pkt, int destination, int tag)
     pthread_mutex_lock(&zegarMut);
     pkt->ts = ++zegar;
     pthread_mutex_unlock(&zegarMut);
+    sleep(1);
     MPI_Send( pkt, 1, MPI_PAKIET_T, destination, tag, MPI_COMM_WORLD);
     if (freepkt) free(pkt);
 }

@@ -6,6 +6,6 @@ void *startKomWatek(void *ptr);
 
 void onStartArming();
 void onStartLocating();
-
+void onStartDebate();
 
 #endif
