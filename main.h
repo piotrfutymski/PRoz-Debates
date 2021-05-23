@@ -9,7 +9,7 @@
 /* używane w wątku głównym, determinuje jak często i na jak długo zmieniają się stany */
 #define STATE_CHANGE_PROB 50
 #define SEC_IN_STATE 1
-#define LOOSE_TIME 1
+#define LOOSE_TIME 5
 
 #define N_SLIPY 3
 #define N_MICHA 3
@@ -30,18 +30,15 @@ extern int zegar;
 
 /* zmienne procesu */
 
-extern process_queue_t waitQueueP;
-extern int ackCounterP;
-extern process_queue_t waitQueueG;
-extern int ackCounterG;
-extern process_queue_t waitQueueM;
-extern int ackCounterM;
+extern process_queue_t waitQueueZ;
+extern int ackCounterZ;
 extern process_queue_t waitQueueS;
 extern int ackCounterS;
 
-extern int ackPriority;
+extern int ackZPriority;
 extern int ackSPriority;
 extern int jestem;
+extern int rezSalke;
 
 extern int przeciwnik;
 typedef enum {PINEZKA, SLIPY, MICHA} argument_t;
@@ -50,9 +47,6 @@ extern argument_t opponentArgument;
 extern int opponentReady;
 extern process_queue_t processQueue;
 extern int pairCounter;
-
-
-
 
 typedef struct {
     int ts;       /* timestamp (zegar lamporta */
@@ -114,6 +108,6 @@ extern MPI_Datatype MPI_PAKIET_T;
 
 /* wysyłanie pakietu, skrót: wskaźnik do pakietu (0 oznacza stwórz pusty pakiet), do kogo, z jakim typem */
 void sendPacket(packet_t *pkt, int destination, int tag);
-void changeState( state_t );
+void changeState( state_t, const char * name, void(*fun)());
 
 #endif

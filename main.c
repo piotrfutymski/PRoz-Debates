@@ -12,8 +12,8 @@
 
 state_t stan = REST;
 argument_t argument, opponentArgument;
-int size, rank, zegar, ackCounterG, ackSPriority, ackCounterM, ackCounterP, ackCounterS, przeciwnik, opponentReady, pairCounter, ackPriority, jestem; /* nie trzeba zerować, bo zmienna globalna statyczna */
-process_queue_t waitQueueG, waitQueueM, waitQueueP, waitQueueS, processQueue;
+int size, rank, zegar, ackCounterZ, ackCounterS, przeciwnik, opponentReady, pairCounter, ackZPriority, ackSPriority, jestem, rezSalke; /* nie trzeba zerować, bo zmienna globalna statyczna */
+process_queue_t waitQueueS, waitQueueZ, processQueue;
 
 MPI_Datatype MPI_PAKIET_T;
 volatile char end = FALSE;
@@ -75,10 +75,8 @@ void inicjuj(int *argc, char ***argv)
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     srand(rank);
 
-    initQueue(&waitQueueG, size);
-    initQueue(&waitQueueP, size);
     initQueue(&waitQueueS, size);
-    initQueue(&waitQueueM, size);
+    initQueue(&waitQueueZ, size);
     initQueue(&processQueue, size);
 
     pthread_create( &threadKom, NULL, startKomWatek , 0);
@@ -95,9 +93,7 @@ void finalizuj()
     /* Czekamy, aż wątek potomny się zakończy */
     println("czekam na wątek \"komunikacyjny\"\n" );
     pthread_join(threadKom,NULL);
-    freeQueue(&waitQueueG);
-    freeQueue(&waitQueueM);
-    freeQueue(&waitQueueP);
+    freeQueue(&waitQueueZ);
     freeQueue(&waitQueueS);
     freeQueue(&processQueue);
     MPI_Type_free(&MPI_PAKIET_T);
@@ -114,14 +110,16 @@ void sendPacket(packet_t *pkt, int destination, int tag)
     pthread_mutex_lock(&zegarMut);
     pkt->ts = ++zegar;
     pthread_mutex_unlock(&zegarMut);
-    sleep(1);
+    //sleep(1);
     MPI_Send( pkt, 1, MPI_PAKIET_T, destination, tag, MPI_COMM_WORLD);
     if (freepkt) free(pkt);
 }
 
-void changeState( state_t newState )
+void changeState( state_t newState, const char * name, void(*fun)())
 { 
-    stan = newState;   
+    stan = newState;
+    debug("Zmieniam stan na {%s}", name);
+    fun();
 }
 
 int main(int argc, char **argv)

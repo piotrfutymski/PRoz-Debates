@@ -12,10 +12,12 @@ void mainLoop()
             pthread_mutex_lock( &stateMut );
             if (perc<STATE_CHANGE_PROB)
             {
-                debug("Zmieniam stan na {QUEUE}");
-                changeState(QUEUE);
-                onStartQueueing();            
+                changeState(QUEUE, "QUEUE", onStartQueueing);
+                if(size >= 4)
+                debug("Moja kolejka procesów - początek: [%d, %d, %d, %d, ...",
+			  processQueue.data[0].process, processQueue.data[1].process, processQueue.data[2].process, processQueue.data[3].process);
             }
+                
             pthread_mutex_unlock( &stateMut );
         }
         else if(stan == DEBATE)
@@ -34,9 +36,7 @@ void mainLoop()
                     debug("Kończę debatę z %d. PRZEGRAŁEM :(", przeciwnik);
                     sleep( LOOSE_TIME );
                 }            
-                debug("Zmieniam stan na {REST}");
-                changeState(REST);
-                onStartResting();
+                changeState(REST, "REST", onStartResting);
                 pthread_mutex_unlock( &stateMut );                  
             }
         }
@@ -65,40 +65,33 @@ void onStartQueueing()
 
 void onStartResting()
 {
-    for(int i = 0; i < waitQueueG.size; i++)
+    int msgType;
+    if (argument == PINEZKA)
+		msgType = ACK_PINEZKA;
+	else if (argument == MICHA)
+		msgType = ACK_MICHA;
+	else if (argument == SLIPY)
+		msgType = ACK_SLIPY;
+    for(int i = 0; i < waitQueueZ.size; i++)
     {
         packet_t * pkt = malloc(sizeof(packet_t));
-        pkt->data = waitQueueG.data[i].priority;
-        sendPacket( pkt, waitQueueG.data[i].process, ACK_SLIPY);
+        pkt->data = waitQueueZ.data[i].priority;
+        sendPacket( pkt, waitQueueZ.data[i].process, msgType);
     }
-    removeNFirstElements(&waitQueueG, waitQueueG.size);
-    for(int i = 0; i < waitQueueP.size; i++)
-    {
-        packet_t * pkt = malloc(sizeof(packet_t));
-        pkt->data = waitQueueP.data[i].priority;
-        sendPacket( pkt, waitQueueP.data[i].process, ACK_PINEZKA);
-    }
-    removeNFirstElements(&waitQueueP, waitQueueG.size);
-    for(int i = 0; i < waitQueueM.size; i++)
-    {
-        packet_t * pkt = malloc(sizeof(packet_t));
-        pkt->data = waitQueueM.data[i].priority;
-        sendPacket( pkt, waitQueueM.data[i].process, ACK_MICHA);
-    }
-    removeNFirstElements(&waitQueueM, waitQueueG.size);
+    removeNFirstElements(&waitQueueZ, waitQueueZ.size);
     for(int i = 0; i < waitQueueS.size; i++)
     {
         packet_t * pkt = malloc(sizeof(packet_t));
         pkt->data = waitQueueS.data[i].priority;
         sendPacket( pkt, waitQueueS.data[i].process, ACK_SALKA);
     }
-    removeNFirstElements(&waitQueueS, waitQueueG.size);
+    removeNFirstElements(&waitQueueS, waitQueueS.size);
     opponentReady = FALSE;
+    rezSalke = FALSE;
 }
 
 int calculateWinner()
 {
-    debug("Moim argumentem jest: %d, a przeciwnika %d", argument, opponentArgument);
     if(argument == opponentArgument)
     {
         if(przeciwnik > rank)
