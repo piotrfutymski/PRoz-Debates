@@ -8,7 +8,7 @@
 
 /* używane w wątku głównym, determinuje jak często i na jak długo zmieniają się stany */
 #define STATE_CHANGE_PROB 50
-#define SEC_IN_STATE 1
+#define SEC_IN_STATE 2
 #define LOOSE_TIME 5
 
 #define N_SLIPY 3

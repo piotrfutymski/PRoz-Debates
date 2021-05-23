@@ -30,14 +30,16 @@ void mainLoop()
                 if(calculateWinner())
                 {
                     debug("Kończę debatę z %d. WYGRAŁEM :D", przeciwnik);
+                    changeState(REST, "REST", onStartResting);
+                    pthread_mutex_unlock( &stateMut );   
                 }
                 else
                 {
                     debug("Kończę debatę z %d. PRZEGRAŁEM :(", przeciwnik);
+                    changeState(REST, "REST", onStartResting);
+                    pthread_mutex_unlock( &stateMut );   
                     sleep( LOOSE_TIME );
-                }            
-                changeState(REST, "REST", onStartResting);
-                pthread_mutex_unlock( &stateMut );                  
+                }                                          
             }
         }
     }
